@@ -31,7 +31,7 @@ class Index:
 
 if __name__ == '__main__':
     start_date = (2003, 1, 1)
-    sensex = Index('sensex')
+    sensex = Index('bse_sensex')
     sensex_data = sensex.start(start_date)
     sip = sensex.sip(date=datetime(2000, 1, 1))
     sip.plot()

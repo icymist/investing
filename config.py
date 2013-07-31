@@ -6,7 +6,7 @@ home_dir = os.environ['HOME']
 
 investing_dir = os.path.join(home_dir, 'mytools', 'investing')
 
-data_dir = os.path.join('data', 'investing')
+data_dir = os.path.join(home_dir, 'data', 'investing')
 
 indices_dir = os.path.join(data_dir, 'indices')
 
@@ -16,7 +16,7 @@ nse_bhavcopy_data_dir = os.path.join(data_dir, 'bhavcopy', 'nse')
 
 # bse indices
 bse_indices_data_dir = os.path.join(data_dir, 'indices')
-bse30_data_file = os.path.join(bse_indices_data_dir, 'sensex.csv')
+bse30_data_file = os.path.join(bse_indices_data_dir, 'bse_sensex.csv')
 midcap_data_file = os.path.join(bse_indices_data_dir, 'bse_midcap.csv')
 smlcap_data_file = os.path.join(bse_indices_data_dir, 'bse_smallcap.csv')
 bse100_data_file = os.path.join(bse_indices_data_dir, 'bse_100.csv')

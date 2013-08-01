@@ -2,8 +2,6 @@
 
 import os
 
-# another stupid change
-
 home_dir = os.environ['HOME']
 
 investing_dir = os.path.join(home_dir, 'mytools', 'investing')

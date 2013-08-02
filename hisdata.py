@@ -34,15 +34,19 @@ class HistoricalData(object):
 
         if start:
             d = dateparser(start)
-            self._df = self._df[self._df.index >= d]
+            #self._df = self._df[self._df.index >= d]
+            self._df = self._df[d:]
         if end:
             d = dateparser(end)
-            self._df = self._df[self._df.index < d]
+            #self._df = self._df[self._df.index < d]
+            self._df = self._df[:d]
         if start and end:
             sd = dateparser(start)
             ed = dateparser(end)
-            self._df = self._df[self._df.index >= d]
-            self._df = self._df[self._df.index < d]
+            #self._df = self._df[self._df.index >= d]
+            #self._df = self._df[self._df.index < d]
+            self._df = self._df[d:]
+            self._df = self._df[:d]
 
     @property
     def df(self):

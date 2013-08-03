@@ -39,6 +39,7 @@ class IndexConstituents:
         self._df = pd.read_csv(index_constituents_file, skiprows=2,
                 header=None, names=cols, skipinitialspace=True)
         self._df.bsecode = self._df.bsecode.astype(str)
+        self._df = self._df.set_index('bsecode', drop=False)
 
     @property
     def df(self):
@@ -74,7 +75,7 @@ class IndexConstituents:
 
     @property
     def health_care(self):
-        return self._df[self._df.index_name == 'S&P BSE HEALTH CARE']
+        return self._df[self._df.index_name == 'S&P BSE HEALTHCARE']
 
     @property
     def it(self):
@@ -150,6 +151,11 @@ class IndexConstituents:
         return set(companies.bsecode)
 
     @property
+    def company_names(self):
+        df = self._df['company_name'].drop_duplicates()
+        return df
+
+    @property
     def industries(self):
         return set(self._df.industry)
 
@@ -160,6 +166,7 @@ class IndexConstituents:
 
 if __name__ == '__main__':
     ic = IndexConstituents()
-    print ic.sensex.company_name
-    print ic.midcap.company_name
-    print ic.smallcap.company_name
+    #print ic.sensex.company_name
+    #print ic.midcap.company_name
+    #print ic.smallcap.company_name
+    print ic.company_names

@@ -3,10 +3,15 @@
 from config import data_dir
 import os
 import pandas as pd
+from pandas.tseries.offsets import DateOffset, BDay
 import matplotlib.pyplot as plt
 from datetime import datetime
+from datetime import date
 import numpy as np
 from dateparser import dateparser
+
+today = datetime.today()
+today = datetime(today.year, today.month, today.day)
 
 index_file = lambda index: os.path.join(data_dir, 'indices', index + '.csv')
 stock_file = lambda bsecode: os.path.join(data_dir, 'stocks', bsecode+'.csv')
@@ -79,6 +84,93 @@ class HistoricalData(object):
     @property
     def ma200(self):
         return pd.rolling_mean(self.close, 200)
+
+    def get_return(self, d):
+        try:
+            return self.close[-1]/self.close.truncate(after=d)[-1]
+        except IndexError:
+            return None
+
+    @property
+    def m1(self):
+        d = today - DateOffset(months=1)
+        return self.get_return(d)
+
+    @property
+    def m3(self):
+        d = today - DateOffset(months=3)
+        return self.get_return(d)
+
+    @property
+    def m6(self):
+        d = today - DateOffset(months=6)
+        return self.get_return(d)
+
+    @property
+    def y1(self):
+        d = today - DateOffset(years=1)
+        return self.get_return(d)
+
+    @property
+    def y2(self):
+        d = today - DateOffset(years=2)
+        return self.get_return(d)
+
+    @property
+    def y3(self):
+        d = today - DateOffset(years=3)
+        return self.get_return(d)
+
+    @property
+    def y4(self):
+        d = today - DateOffset(years=4)
+        return self.get_return(d)
+
+    @property
+    def y5(self):
+        d = today - DateOffset(years=5)
+        return self.get_return(d) 
+
+    @property
+    def y6(self):
+        d = today - DateOffset(years=6)
+        return self.get_return(d) 
+
+    @property
+    def y7(self):
+        d = today - DateOffset(years=7)
+        return self.get_return(d) 
+
+    @property
+    def y8(self):
+        d = today - DateOffset(years=8)
+        return self.get_return(d) 
+
+    @property
+    def y9(self):
+        d = today - DateOffset(years=9)
+        return self.get_return(d) 
+
+    @property
+    def y10(self):
+        d = today - DateOffset(years=10)
+        return self.get_return(d)
+
+    @property
+    def returns(self):
+        return {'1m': self.m1,
+                '3m': self.m3,
+                '6m': self.m6,
+                '1y': self.y1,
+                '2y': self.y2,
+                '3y': self.y3,
+                '4y': self.y4,
+                '5y': self.y5,
+                '6y': self.y6,
+                '7y': self.y7,
+                '8y': self.y8,
+                '9y': self.y9,
+                '10y': self.y10}
 
 class Index(HistoricalData):
     def __init__(self, index, file=None, start=None, end=None):

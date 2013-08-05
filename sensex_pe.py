@@ -4,7 +4,7 @@ import pandas as pd
 from hisdata import Index
 import matplotlib.pyplot as plt
 
-bse_sensex = Index('bse_sensex', start='-6y')#start='2006-06-02', end='2012-06-02')
+bse_sensex = Index('bse_sensex')#, start='-6y')#start='2006-06-02', end='2012-06-02')
 pe = bse_sensex.pe
 pe_ma200 = pd.rolling_mean(pe, 200)
 pe_std200 = pd.rolling_std(pe, 200)

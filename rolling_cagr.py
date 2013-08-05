@@ -7,8 +7,11 @@ from hisdata import Index
 
 sensex = Index('bse_sensex')
 sensex_daily = sensex.close.asfreq('D', method='pad')
-sensex_monthly = sensex.close.resample('MS')#, method='pad')
-sensex_yearly = sensex.close.resample('AS')#, method='pad')
+sensex_monthly = sensex.close.asfreq('BMS', method='pad')
+sensex_yearly = sensex.close.asfreq('BAS', method='pad')#, how=None)#, method='pad')
+
+print sensex_yearly
+print sensex_yearly.pct_change()
 
 # rolling averages
 ra_daily = {i: sensex_daily.pct_change(i*365) for i in range(1,24)}

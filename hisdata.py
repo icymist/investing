@@ -180,6 +180,38 @@ class HistoricalData(object):
                 '9y': self.y9,
                 '10y': self.y10}
 
+    def rolling_cagr(self, avg='monthly'):
+        close = self._df.close
+        rng = range(1, 24)
+
+        if avg == 'daily':
+            # sample to every day
+            close = close.asfreq('D', method='pad')
+            # compute rolling average over 365 days
+            ra = {i: close.pct_change(i*365) for i in rng}
+        elif avg == 'monthly':
+            # sample down to first business day of the month
+            close = close.asfreq('BMS', method='pad')
+            # compute rolling average over 1 yr, 2 yrs, 3 yrs, ...
+            ra = {i: close.pct_change(i*12) for i in rng}
+        elif avg == 'yearly':
+            # sample down to first business day of calendar year
+            close = close.asfreq('BAS', method='pad')
+            # compute rolling average 1 yr, 2 yrs, 3 yrs, ...
+            ra = {i: close.pct_change(i) for i in rng}
+
+        # sample down all the computed averages to start of the year
+        rs = {i: ra[i].resample('BAS', how='mean') for i in rng}
+
+        # calculate cagr in %
+        cagr = {i: 100*((rs[i]+1)**(1/float(i))-1) for i in rng}
+
+        # make them into a dataframe
+        df = pd.DataFrame(cagr)
+
+        return df
+
+
 class Index(HistoricalData):
     def __init__(self, index, file=None, start=None, end=None):
         if file:

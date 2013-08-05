@@ -26,7 +26,7 @@ def apply_filter(f):
     # average all the returns over the years
     df['score'] = df.mean(axis=1)
     # to count the number of years the company beat the index
-    df1['score'] = df1.sum(axis=1)
+    df1['score'] = df1.fillna(1).sum(axis=1)
 
     # make another dataframe with just the scores and the company name
     df2 = pd.DataFrame({'score1': df['score'],
@@ -34,12 +34,14 @@ def apply_filter(f):
                         'company_name': df['company_name']})
 
     # weed out the weak companies
-    df3 = df2[ (df2.score1 > 1.2) & (df2.score2 >= 7)]
+    df3 = df2[ (df2.score1 > 1.0) & (df2.score2 >= 7)]
     #df3.sort('score1', ascending=False)[['company_name', 'score1', 'score2']]
     return df3
 
 if __name__ == '__main__':
     bsecodes = []
+    # collect all the dataframes
+    dfs = {}
     for f in ['sensex', 'midcap', #'smallcap',
               'bse100', 'bse200', #'bse500',
               'capital_goods', 'consumer_durables',
@@ -48,10 +50,17 @@ if __name__ == '__main__':
               'bankex', 'realty', 'power']:
         print "====== %s ======" % (f)
         df = apply_filter(f)
+        dfs[f] = df
         bsecodes.extend(df.index.values)
         print df.sort('score1', ascending=False)[['company_name', 'score1', 'score2']]
         print
         print
+
+# concat all the dataframes and drop the duplicates
+final_df = pd.concat(dfs.values()).drop_duplicates()
+final_df.to_csv('masterlist.csv')
+
+print final_df.head()
 
 for bsecode in set(bsecodes):
     print bsecode, company_names.ix[bsecode]

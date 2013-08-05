@@ -50,8 +50,8 @@ class HistoricalData(object):
             ed = dateparser(end)
             #self._df = self._df[self._df.index >= d]
             #self._df = self._df[self._df.index < d]
-            self._df = self._df[d:]
-            self._df = self._df[:d]
+            self._df = self._df[sd:]
+            self._df = self._df[:ed]
 
     @property
     def df(self):
@@ -87,7 +87,11 @@ class HistoricalData(object):
 
     def get_return(self, d):
         try:
-            return self.close[-1]/self.close.truncate(after=d)[-1]
+            #print self.close.index[-1], self.close[-1]
+            #print self.close.truncate(after=d).index[-1], self.close.truncate(after=d)[-1]
+            ret = self.close[-1]/self.close.truncate(after=d)[-1]
+            #print ret
+            return ret
         except IndexError:
             return None
 
@@ -109,6 +113,7 @@ class HistoricalData(object):
     @property
     def y1(self):
         d = today - DateOffset(years=1)
+        #print 'calculating 1 yr return'
         return self.get_return(d)
 
     @property
@@ -119,6 +124,7 @@ class HistoricalData(object):
     @property
     def y3(self):
         d = today - DateOffset(years=3)
+        #print 'calculating 3 yr return'
         return self.get_return(d)
 
     @property
@@ -129,6 +135,7 @@ class HistoricalData(object):
     @property
     def y5(self):
         d = today - DateOffset(years=5)
+        #print 'calculating 5 yr return'
         return self.get_return(d) 
 
     @property
@@ -154,6 +161,7 @@ class HistoricalData(object):
     @property
     def y10(self):
         d = today - DateOffset(years=10)
+        #print 'calculating 10 yr return'
         return self.get_return(d)
 
     @property
@@ -217,11 +225,12 @@ class Stock(HistoricalData):
 if __name__ == '__main__':
 
     arb = Stock('500008', start=(2000, 1, 1))
-    sensex = Index('bse_sensex', start=(2000, 1, 1))
+    sensex = Index('bse_sensex', start='-10y')#start=(2000, 1, 1))
     #print arb.ma50.tail()
     arb_norm = 100*arb.close/arb.close[0]
     sensex_norm = 100*sensex.close/sensex.close[0]
     #fig, axes = plt.subplots(nrows=2, ncols=1)
+    print sensex.pe.describe()
     print sensex.div_yield.describe()
     sensex.close.plot(label='sensex')
     plt.legend()

@@ -9,6 +9,10 @@ from datetime import datetime
 from datetime import date
 import numpy as np
 from dateparser import dateparser
+import re
+from indexconstituents import IndexConstituents as ic
+
+company_names = ic().company_names
 
 today = datetime.today()
 today = datetime(today.year, today.month, today.day)
@@ -182,7 +186,9 @@ class HistoricalData(object):
 
     def rolling_cagr(self, avg='monthly'):
         close = self._df.close
-        rng = range(1, 24)
+        last_year = (close.index[-1].year - close.index[0].year) + 1
+        #rng = range(1, 24)
+        rng = range(1, int(last_year))
 
         if avg == 'daily':
             # sample to every day
@@ -234,7 +240,7 @@ class Index(HistoricalData):
 
 class Stock(HistoricalData):
 
-    def __init__(self, bsecode, file_name=None, start=None, end=None):
+    def __init__(self, bsecode=None, file_name=None, start=None, end=None):
         if file_name:
             self._file = file
         else:
@@ -247,6 +253,10 @@ class Stock(HistoricalData):
                                     cols=stock_cols)
 
 
+def stock_search(s):
+    return company_names[company_names.str.contains(s.upper())]
+
+
     #def sip(self, date=None, freq='MS', value=1000):
     #    print date
     #    closing_prices = self._df[self._df.index > date].close.resample(freq)
@@ -256,21 +266,23 @@ class Stock(HistoricalData):
 
 if __name__ == '__main__':
 
-    arb = Stock('500008', start=(2000, 1, 1))
-    sensex = Index('bse_sensex', start='-10y')#start=(2000, 1, 1))
+    print stock_search('HIND')
+
+    #arb = Stock('500008', start=(2000, 1, 1))
+    #sensex = Index('bse_sensex', start='-10y')#start=(2000, 1, 1))
     #print arb.ma50.tail()
-    arb_norm = 100*arb.close/arb.close[0]
-    sensex_norm = 100*sensex.close/sensex.close[0]
+    #arb_norm = 100*arb.close/arb.close[0]
+    #sensex_norm = 100*sensex.close/sensex.close[0]
     #fig, axes = plt.subplots(nrows=2, ncols=1)
-    print sensex.pe.describe()
-    print sensex.div_yield.describe()
-    sensex.close.plot(label='sensex')
-    plt.legend()
-    sensex.div_yield.plot(secondary_y=True, style='r', label='div_yield')
+    #print sensex.pe.describe()
+    #print sensex.div_yield.describe()
+    #sensex.close.plot(label='sensex')
+    #plt.legend()
+    #sensex.div_yield.plot(secondary_y=True, style='r', label='div_yield')
     #sensex.div_yield.plot(ax=axes[0])
     #sensex.close.plot(ax=axes[1])
-    plt.savefig('sensex_vs_div_yield.png')
-    plt.show()
+    #plt.savefig('sensex_vs_div_yield.png')
+    #plt.show()
     #arb_norm.plot()
     #sensex_norm.plot()
     #print s.df['d3'].dropna()

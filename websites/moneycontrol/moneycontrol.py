@@ -4,10 +4,11 @@ import os, sys
 import argparse
 import yaml
 from investing.config import company_groups_file, moneycontrol_data_dir
+from investing.config import historical_stock_data_dir
 from functools import partial
 from multiprocessing import Pool
-import updating
-from download import parallel_download
+import updater
+from downloader import parallel_download
 #import re
 #from bs4 import BeautifulSoup
 
@@ -108,7 +109,7 @@ def get_dst_fname(bsecode, s=None):
     elif s == 'share_holding':
         dst_fname = os.path.join(moneycontrol_data_dir, 'share_holding', bsecode+'.html')
     elif s == 'historical_stock_data':
-        dst_fname = os.path.join(moneycontrol_data_dir, 'historical_stock_data', bsecode+'.csv')
+        dst_fname = os.path.join(historical_stock_data_dir, bsecode+'.csv')
         
     return dst_fname
     
@@ -125,7 +126,7 @@ def download(bsecodes, s, update):
     if update == 'update':
         files_not_to_download = []
         for bsecode, url_dst_fname in d.items():
-            if updating.file_exists(url_dst_fname[1]):
+            if updater.file_exists(url_dst_fname[1]):
                 files_not_to_download.append(bsecode)
         for key in files_not_to_download:
             del d[key]
@@ -133,8 +134,7 @@ def download(bsecodes, s, update):
         pass
 
     urls, dst_fnames = zip(*d.values())
-    p = Pool(32)
-    p.map(parallel_download, zip(urls, dst_fnames))
+    parallel_download(urls, dst_filenames, nthreads=32)
         
     return None
 

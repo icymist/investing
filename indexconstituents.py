@@ -163,10 +163,12 @@ class IndexConstituents:
     def consumer_durables_companies(self):
         pass
 
+company_names = IndexConstituents().company_names
 
 if __name__ == '__main__':
-    ic = IndexConstituents()
+    #ic = IndexConstituents()
     #print ic.sensex.company_name
     #print ic.midcap.company_name
     #print ic.smallcap.company_name
-    print ic.company_names
+    #print ic.company_names
+    print company_names

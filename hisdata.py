@@ -217,6 +217,29 @@ class HistoricalData(object):
 
         return df
 
+    def benchmark_against(self, benchmark):
+
+        stk = self.rolling_cagr(avg='monthly')
+        bm = benchmark.rolling_cagr()
+
+        df1 = stk[1:]
+        try:
+            c1 = bm.ix[stk.index[1]:]
+        except IndexError:
+            return None, None, None
+        df2 = c1.iloc[:,:len(stk.columns)]
+        #print df2
+
+        pts = df1.copy()
+        for i in range(len(pts)):
+            for j in range(len(pts.columns)):
+                if not pd.isnull(df1.iloc[i,j]):
+                    if df1.iloc[i,j] > df2.iloc[i,j]:
+                        pts.iloc[i,j] = 1
+                    else:
+                        pts.iloc[i,j] = 0
+
+        return stk, df2, pts
 
 class Index(HistoricalData):
     def __init__(self, index, file=None, start=None, end=None):

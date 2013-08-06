@@ -54,7 +54,7 @@ def compare_against(stock, benchmark):
 
     return pts
 
-for stock in ['532461', '532179', '500112', '532174']:
+for stock in ['500093', '500067', '500575']:
     pts = compare_against(stock, 'bse_sensex')
     print pts
     print pts.mean().mean()

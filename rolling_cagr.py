@@ -1,39 +1,44 @@
 #! /usr/bin/env python
 
+"""
+Script to display the calculated rolling CAGR of a given stock along with a
+given reference index.  The reference index defaults to the BSE Sensex.
+"""
+
+import sys
 import pandas as pd
-from hisdata import Index
-#import matplotlib.pyplot as plt
-#pd.set_option('display.max_columns', 30)
+from hisdata import Stock, Index, stock_search
+import argparse
+from displayoptions import display_options
 
-sensex = Index('bse_sensex')
-sensex_daily = sensex.close.asfreq('D', method='pad')
-sensex_monthly = sensex.close.asfreq('BMS', method='pad')
-sensex_yearly = sensex.close.asfreq('BAS', method='pad')#, how=None)#, method='pad')
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
 
-print sensex_yearly
-print sensex_yearly.pct_change()
+    #parser.add_argument('bsecode')#, required=True)
+    parser.add_argument('-s', '--search', default=True)
+    parser.add_argument('-index', '--index', default='bse_sensex')
 
-# rolling averages
-ra_daily = {i: sensex_daily.pct_change(i*365) for i in range(1,24)}
-ra_monthly = {i: sensex_monthly.pct_change(i*12) for i in range(1,24)}
-ra_yearly = {i: sensex_yearly.pct_change(i) for i in range(1,24)}
+    args = parser.parse_args()
 
-# resample down
-rs_daily = {i: ra_daily[i].resample('BAS', how='mean') for i in range(1,24)}
-rs_monthly = {i: ra_monthly[i].resample('BAS', how='mean') for i in range(1,24)}
-rs_yearly = {i: ra_yearly[i].resample('BAS', how='mean') for i in range(1,24)}
+    if args.search:
+        matches = stock_search(args.search)
+        if len(matches) > 1:
+            choice = display_options(matches)
+            bsecode = matches.index[choice]
+        elif len(matches) == 0:
+            print 'Company not in any of the indices'
+            print
+            sys.exit(-1)
+        elif len(matches) == 1:
+            choice = 0
+            bsecode = matches.index[0]
+        print matches[choice]
 
-# calculate cagrs
-cagr_daily = {i: 100*((rs_daily[i]+1)**(1/float(i))-1) for i in range(1,24)}
-cagr_monthly = {i: 100*((rs_monthly[i]+1)**(1/float(i))-1) for i in range(1,24)}
-cagr_yearly = {i: 100*((rs_yearly[i]+1)**(1/float(i))-1) for i in range(1,24)}
-
-# make them into a dataframe
-df_daily = pd.DataFrame(cagr_daily)
-df_monthly = pd.DataFrame(cagr_monthly)
-df_yearly = pd.DataFrame(cagr_yearly)
-
-# write to csv files
-df_daily.to_csv('rolling_cagr_daily.csv')
-df_monthly.to_csv('rolling_cagr_monthly.csv')
-df_yearly.to_csv('rolling_cagr_yearly.csv')
+    stk = Stock(bsecode)
+    idx = Index(args.index)
+    
+    stk_returns, bm_returns, pts = stk.benchmark_against(idx)
+    print stk_returns
+    print bm_returns
+    print pts
+    print pts.mean().mean()

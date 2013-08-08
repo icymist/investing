@@ -46,19 +46,19 @@ class IndexConstituents:
         return self._df
 
     @property
-    def sensex(self):
+    def bse_sensex(self):
         return self._df[self._df.index_name == 'S&P BSE SENSEX']
 
     @property
-    def bse500(self):
+    def bse_500(self):
         return self._df[self._df.index_name == 'S&P BSE 500']
 
     @property
-    def bse100(self):
+    def bse_100(self):
         return self._df[self._df.index_name == 'S&P BSE 100']
 
     @property
-    def bse200(self):
+    def bse_200(self):
         return self._df[self._df.index_name == 'S&P BSE 200']
 
     @property

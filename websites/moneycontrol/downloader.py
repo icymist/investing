@@ -19,7 +19,7 @@ def get_html(url):
             
 def download(url, dst):
     if url and dst:
-        print 'tryin downloading'
+        print 'Downloading: %s\nDestination: %s\n' % (url, dst)
         html = get_html(url)
         if html:
             f = open(dst, 'w')
@@ -36,13 +36,17 @@ def parallel_download(urls, dst_file_names, nthreads=32, download_if_no_file=Tru
     if download_if_no_file:
         for k in d.keys():
             if os.path.exists(k):
+                print '%s file exists... not downloading' % (k)
                 del d[k]
                 
-    print d
+    # return if there is nothing to download
+    if not d: return None
+
     dst_file_names, urls = zip(*d.items())
     url_dst = zip(urls, dst_file_names)
     p = Pool(nthreads)
     p.map(_parallel_download, url_dst)
+
     return None
 
 if __name__ == '__main__':

@@ -249,7 +249,8 @@ class Index(HistoricalData):
             self._file = index_file(index)
 
         if index in ['bse_bankex', 'bse_midcap', 'bse_power', 'bse_psu',
-                     'bse_realty', 'bse_sensex', 'bse_smallcap', 'bse_teck']:
+                     'bse_realty', 'bse_sensex', 'bse_smallcap', 'bse_teck',
+                     'bse_200', 'bse_500']:
             cols = index_cols_1
         else:
             cols = index_cols_2

@@ -104,7 +104,7 @@ def run():
     for bsecode, filename in zip(bsecodes, stock_quote_files):
         latest_data[bsecode] = parse_stock_quote_page_file(filename)
     df = pd.DataFrame.from_dict(latest_data, orient='index')
-    df.to_csv(os.path.join(moneycontrol_data_dir, 'latest_stock_data.csv'))
+    df.to_csv(os.path.join(moneycontrol_data_dir, 'latest_stock_data.csv'), index_label='bsecode')
             
 if __name__ == '__main__':
     run()

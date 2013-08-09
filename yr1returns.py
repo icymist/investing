@@ -1,10 +1,19 @@
 #! /usr/bin/env python
 
+import os
 from hisdata import Stock, Index, HistoricalData 
 from indexconstituents import IndexConstituents as ic
 import pandas as pd
 from pandas.tseries.offsets import DateOffset
 from multiprocessing import cpu_count, Pool
+from config import moneycontrol_data_dir
+
+# latest stock data
+latest_stock_data_file = os.path.join(moneycontrol_data_dir, 'latest_stock_data.csv')
+ldf = pd.read_csv(latest_stock_data_file)
+ldf.bsecode = ldf.bsecode.astype(str)
+ldf = ldf.set_index('bsecode')
+
 ncpus = cpu_count()
 
 # does not work with multiprocessing if Pool is initialized here
@@ -48,6 +57,8 @@ def get_1yr_returns(index):
 
 if __name__ == '__main__':
     idx = 'bse_200'
-    df = get_1yr_returns('bse_200')
+    df = get_1yr_returns(idx)
     df = df.sort('returns', ascending=False)
-    df.to_csv('yr1returns_' + idx + '.csv')
+    df1 = df.join(ldf)
+    print df1
+    df1.to_csv('yr1returns_' + idx + '.csv')

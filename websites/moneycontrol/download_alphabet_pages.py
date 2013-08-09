@@ -7,6 +7,7 @@ import os
 from string import ascii_uppercase
 from downloader import parallel_download
 from investing.config import moneycontrol_data_dir
+import argparse
 
 dst_dir = os.path.join(moneycontrol_data_dir, 'alphabets')
 
@@ -26,4 +27,12 @@ def download_alphabet_pages(download_if_no_file=True):
                       download_if_no_file=download_if_no_file)
 
 if __name__ == '__main__':
-    download_alphabet_pages(download_if_no_file=True)
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-f', '--fresh', default=False, action='store_true',
+            help = 'to download all the files afresh')
+
+    args = parser.parse_args()
+    if args.fresh:
+        download_alphabet_pages(download_if_no_file=False)
+    else:
+        download_alphabet_pages(download_if_no_file=True)

@@ -11,11 +11,14 @@ from multiprocessing import cpu_count, Pool
 ncpus = cpu_count()
 
 def get_html(url):
-    try:
-        html = urlopen(url, timeout=60).read()
-        return html
-    except:
-        print 'Not able to retrieve page for\n%s' % (url)
+    i = 0
+    while i < 10:
+        try:
+            html = urlopen(url, timeout=60).read()
+            return html
+        except:
+            i += 1
+            print 'Attempt %i: Not able to retrieve page for\n%s' % (i, url)
             
 def download(url, dst):
     if url and dst:

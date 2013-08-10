@@ -106,11 +106,11 @@ class IndexConstituents:
         return self._df[self._df.index_name == 'S&P BSE BANKEX']
 
     @property
-    def midcap(self):
+    def bse_midcap(self):
         return self._df[self._df.index_name == 'S&P BSE MID CAP']
 
     @property
-    def smallcap(self):
+    def bse_smallcap(self):
         return self._df[self._df.index_name == 'S&P BSE SMALL CAP']
 
     @property
@@ -151,8 +151,10 @@ class IndexConstituents:
         return set(companies.bsecode)
 
     @property
-    def company_names(self):
-        df = self._df['company_name'].drop_duplicates()
+    def useful_companies(self):
+        companies = self.exclude_useless_companies()
+        df = companies['company_name'].drop_duplicates()
+        df = pd.DataFrame(df)
         return df
 
     @property
@@ -163,7 +165,7 @@ class IndexConstituents:
     def consumer_durables_companies(self):
         pass
 
-company_names = IndexConstituents().company_names
+useful_companies = IndexConstituents().useful_companies
 
 if __name__ == '__main__':
     #ic = IndexConstituents()

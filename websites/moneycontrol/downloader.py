@@ -5,6 +5,7 @@ script to download a given html page and store it to a given destination
 """
 
 import os
+import time
 from urllib2 import urlopen
 from multiprocessing import cpu_count, Pool
 
@@ -18,6 +19,7 @@ def get_html(url):
             return html
         except:
             i += 1
+            time.sleep(i*5)
             print 'Attempt %i: Not able to retrieve page for\n%s' % (i, url)
             
 def download(url, dst):

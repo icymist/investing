@@ -12,7 +12,7 @@ from dateparser import dateparser
 import re
 from indexconstituents import IndexConstituents as ic
 
-company_names = ic().company_names
+company_names = ic().useful_companies
 
 today = datetime.today()
 today = datetime(today.year, today.month, today.day)
@@ -32,11 +32,24 @@ class HistoricalData(object):
 
         self._file = file_name
 
-        self._df = pd.read_csv(self._file,
+        try:
+            self._df = pd.read_csv(self._file,
                                skiprows = kwargs.get('skiprows', 0),
                                header = None,
                                names = kwargs.get('cols'),
                                index_col = False)
+        except IOError:
+            print 'Looks like %s does not exist' % (self._file)
+            self._df = pd.DataFrame({'date': [],
+                                     'open': [],
+                                     'high': [],
+                                     'low': [],
+                                     'close': [],
+                                     'volume': [],
+                                     'bonus': [],
+                                     'dividend': [],
+                                     'd3': [],
+                                     'split': []})
 
         self._df.index = pd.to_datetime(self._df.date)
 
@@ -278,7 +291,8 @@ class Stock(HistoricalData):
 
 
 def stock_search(s):
-    return company_names[company_names.str.contains(s.upper())]
+    #company_names = company_names.company_name
+    return company_names[company_names.company_name.str.contains(s.upper())].company_name
 
 
     #def sip(self, date=None, freq='MS', value=1000):

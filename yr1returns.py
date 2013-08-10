@@ -21,7 +21,13 @@ ncpus = cpu_count()
 # p = Pool(ncpus)
 
 def yr1_return(bsecode):
-    return Stock(bsecode).y1
+    try:
+        ret = Stock(bsecode).y1
+    except IOError:
+        print '%s does not exist' % bsecode
+        ret = 0.0
+    return ret
+
 
 # does not work with multiprocessing
 # always define an explicit function
@@ -34,6 +40,10 @@ def get_1yr_returns(index):
         idx = ic().bse_midcap
     elif index == 'bse_200':
         idx = ic().bse_200
+    elif index == 'bse_500':
+        idx = ic().bse_500
+    elif index == 'bse_smallcap':
+        idx = ic().bse_smallcap
 
     stk_bsecodes = idx.bsecode
     stk_company_names = idx.company_name
@@ -56,9 +66,14 @@ def get_1yr_returns(index):
     return df
 
 if __name__ == '__main__':
-    idx = 'bse_200'
-    df = get_1yr_returns(idx)
-    df = df.sort('returns', ascending=False)
-    df1 = df.join(ldf)
-    print df1
-    df1.to_csv('yr1returns_' + idx + '.csv')
+    #idxs = ['bse_sensex', 'bse_200', 'bse_500', 'bse_midcap', 'bse_smallcap']
+    idxs = ['bse_500']#, 'bse_midcap', 'bse_smallcap']
+    for idx in idxs:
+        print idx
+        df = get_1yr_returns(idx)
+        df = df.sort('returns', ascending=False)
+        df1 = df.join(ldf)
+        df1['adjusted_returns'] = df1['returns'] - df1.ix[idx]['returns']
+        print df1[df1.pe < 25].sort('adjusted_returns', ascending=False)[
+                ['company_name', 'pe', 'div_yield', 'adjusted_returns']]
+        df1.to_csv('yr1returns_' + idx + '.csv')

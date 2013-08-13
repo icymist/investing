@@ -14,6 +14,23 @@ from displayoptions import display_options
 pd.set_option('precision', 2)
 pd.set_option('display.max_columns', 50)
 
+def benchmark_against(bsecode, index):
+    stk = Stock(bsecode)
+    idx = Index(index)
+    
+    stk_returns, bm_returns, pts = stk.benchmark_against(idx)
+    try:
+        combined = stk_returns.join(bm_returns, rsuffix = '_bse')
+    except AttributeError:
+        combined = None
+
+    if pts:
+        pts_mean = pts.mean().mean()
+    else:
+        pts_mean = 0.0
+    #print stk_returns, bm_returns, combined, pts, pts_mean
+    return stk_returns, bm_returns, combined, pts, pts_mean
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
@@ -37,21 +54,19 @@ if __name__ == '__main__':
             bsecode = matches.index[0]
         print matches[choice]
 
-    stk = Stock(bsecode)
-    idx = Index(args.index)
-    
-    stk_returns, bm_returns, pts = stk.benchmark_against(idx)
-    combined = stk_returns.join(bm_returns, rsuffix = '_bse')
+    stk_returns, bm_returns, combined, pts, pts_mean = benchmark_against(bsecode, args.index)
+
     printcols = []
-    for i in range(1,len(stk_returns)):
-        printcols.append('%i' % i)
-        printcols.append('%i_bse' % i)
-    #print printcols
-    print combined[printcols]
-    print
-    print pts
-    print pts.mean().mean()
-    #print printcols
-    #print stk_returns
-    #print bm_returns
-    #print pts
+    if stk_returns:
+        for i in range(1,len(stk_returns)):
+            printcols.append('%i' % i)
+            printcols.append('%i_bse' % i)
+        #print printcols
+        print combined[printcols]
+        print
+        print pts
+        print pts_mean
+        #print printcols
+        #print stk_returns
+        #print bm_returns
+        #print pts

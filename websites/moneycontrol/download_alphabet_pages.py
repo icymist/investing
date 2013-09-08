@@ -20,11 +20,11 @@ alphabet_urls.append(page_url('others'))
 dst_file_names = [os.path.join(dst_dir, s + '.html') for s in ascii_uppercase]
 dst_file_names.append(os.path.join(dst_dir, 'others.html'))
 
-def download_alphabet_pages(download_if_no_file=True):
+def download_alphabet_pages(download_if_dst_exists=False):
     parallel_download(alphabet_urls,
                       dst_file_names,
                       nthreads=2,
-                      download_if_no_file=download_if_no_file)
+                      download_if_dst_exists=download_if_dst_exists)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -33,6 +33,6 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
     if args.fresh:
-        download_alphabet_pages(download_if_no_file=False)
+        download_alphabet_pages(download_if_dst_exists=True)
     else:
-        download_alphabet_pages(download_if_no_file=True)
+        download_alphabet_pages(download_if_dst_exists=False)

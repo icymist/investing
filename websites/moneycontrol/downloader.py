@@ -13,7 +13,7 @@ ncpus = cpu_count()
 
 def get_html(url):
     i = 0
-    while i < 10:
+    while i < 3:
         try:
             html = urlopen(url, timeout=60).read()
             return html
@@ -36,9 +36,9 @@ def _parallel_download(url_dst):
     download(url, dst)
     return None
 
-def parallel_download(urls, dst_file_names, nthreads=32, download_if_no_file=True):
+def parallel_download(urls, dst_file_names, nthreads=32, download_if_dst_exists=False):
     d = dict(zip(dst_file_names, urls))
-    if download_if_no_file:
+    if not download_if_dst_exists:
         for k in d.keys():
             if os.path.exists(k):
                 print '%s file exists... not downloading' % (k)
@@ -61,4 +61,4 @@ if __name__ == '__main__':
 
     #p = Pool(2)
     #p.map(parallel_download, zip(urls, dst_names))
-    parallel_download(urls, dst_names)
+    parallel_download(urls, dst_names, download_if_dst_exists=True)

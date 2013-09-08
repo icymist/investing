@@ -16,7 +16,7 @@ def run():
     mc_urls_file = os.path.join(moneycontrol_data_dir, 'stock_quote_page_urls_1.csv')
     mc_urls = pd.read_csv(mc_urls_file)['stock_quote_page_url'].values
     dst_file_names = [dst_file_name(s) for s in mc_urls]
-    parallel_download(mc_urls, dst_file_names, nthreads=64, download_if_no_file=True)
+    parallel_download(mc_urls, dst_file_names, nthreads=64, download_if_dst_exists=False)
 
 if __name__ == '__main__':
     run()

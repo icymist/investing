@@ -4,7 +4,7 @@
 Script to extract bsecodes from downloaded moneycontrol stock quote pages to
 make a csv file with bsecode, moneycontrol_stock_quote_page_url
 
-Files to be parse are read from preliminary stock_quote_page_urls_1 file where
+Files to be parsed are read from preliminary stock_quote_page_urls_1 file where
 only the urls are listed and no bsecodes
 """
 

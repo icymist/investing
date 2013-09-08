@@ -3,16 +3,23 @@
 import os, sys
 import argparse
 import yaml
+import pandas as pd
 from investing.config import company_groups_file, moneycontrol_data_dir
 from investing.config import historical_stock_data_dir
+from investing import indexconstituents
 from functools import partial
-from multiprocessing import Pool
-import updater
+#from multiprocessing import Pool
+#import updater
 from downloader import parallel_download
 #import re
 #from bs4 import BeautifulSoup
 
-map_bsecode_url = yaml.load(open('map_bsecode_to_stock_quote_page_url.yaml'))['urls']
+#map_bsecode_url = yaml.load(open('map_bsecode_to_stock_quote_page_url.yaml'))['urls']
+stock_quote_page_urls_file = os.path.join(moneycontrol_data_dir, 'stock_quote_page_urls.csv')
+df_stock_quote_pages = pd.read_csv(stock_quote_page_urls_file, index_col=0)
+df_stock_quote_pages.index = df_stock_quote_pages.index.astype(str)
+useful_companies = indexconstituents.useful_companies
+df = useful_companies.join(df_stock_quote_pages)
 
 def get_url(bsecode, s=None):
     root = 'http://www.moneycontrol.com/india/stockpricequote'
@@ -21,7 +28,7 @@ def get_url(bsecode, s=None):
     historical_stock_data_base_url = 'http://www.moneycontrol.com'
 
     try:
-        pricequote_url = map_bsecode_url[bsecode]
+        pricequote_url = df_stock_quote_pages.ix[bsecode]['stock_quote_page_url']
     except:
         pricequote_url = ''
         print 'url not available for %s' % (bsecode)
@@ -65,7 +72,7 @@ def get_url(bsecode, s=None):
         
         elif s == 'historical_stock_data':
             stock_quote_page = os.path.join(moneycontrol_data_dir,
-                                        'stock_quote_pages', bsecode+'.html')
+                                        'stock_quote_pages', key2+'.html')
             if os.path.exists(stock_quote_page):
                 t = open(stock_quote_page).read()
                 for i, l in enumerate(t.split()):
@@ -121,20 +128,22 @@ def download(bsecodes, s, update):
     urls = map(get_urls, bsecodes)
     dst_fnames = map(get_dst_fnames, bsecodes)
 
-    d = {bsecode: [url, dst_fname] for (bsecode, url, dst_fname) in zip(bsecodes, urls, dst_fnames)}
+    #print urls, dst_fnames
 
-    if update == 'update':
-        files_not_to_download = []
-        for bsecode, url_dst_fname in d.items():
-            if updater.file_exists(url_dst_fname[1]):
-                files_not_to_download.append(bsecode)
-        for key in files_not_to_download:
-            del d[key]
-    elif update == 'refresh':
-        pass
+    #d = {bsecode: [url, dst_fname] for (bsecode, url, dst_fname) in zip(bsecodes, urls, dst_fnames)}
 
-    urls, dst_fnames = zip(*d.values())
-    parallel_download(urls, dst_filenames, nthreads=32)
+    #if update == 'update':
+    #    files_not_to_download = []
+    #    for bsecode, url_dst_fname in d.items():
+    #        if updater.file_exists(url_dst_fname[1]):
+    #            files_not_to_download.append(bsecode)
+    #    for key in files_not_to_download:
+    #        del d[key]
+    #elif update == 'refresh':
+    #    pass
+
+    #urls, dst_fnames = zip(*d.values())
+    parallel_download(urls, dst_fnames, nthreads=32, download_if_dst_exists=False)
         
     return None
 
@@ -162,8 +171,10 @@ if __name__ == '__main__':
     args = parser.parse_args()
     
     # get the bsecodes companies whose data should be downloaded
-    company_groups = yaml.load(open(company_groups_file))
-    bsecodes = company_groups[args.company_group]
+    #company_groups = yaml.load(open(company_groups_file))
+    #bsecodes = company_groups[args.company_group]
+    bsecodes = df.index
+    print len(bsecodes)
 
     update = args.update
     

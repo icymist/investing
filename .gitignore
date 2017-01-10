@@ -4,3 +4,5 @@
 *.swp
 tmp
 *.csv
+phony.ipynb
+.ipynb_checkpoints

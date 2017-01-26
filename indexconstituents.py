@@ -2,175 +2,46 @@
 
 import os
 import pandas as pd
-from config import indices_dir
+from config import bse_indices_data_dir
+from glob import glob
 
-index_groups = """
-S&P BSE SENSEX
-S&P BSE 500
-S&P BSE 100
-S&P BSE 200
-S&P BSE CAPITAL GOODS
-S&P BSE CONSUMER DURABLES
-S&P BSE FMCG
-S&P BSE HEALTHCARE
-S&P BSE IT
-S&P BSE METAL
-S&P BSE OIL & GAS
-S&P BSE AUTO
-S&P BSE PSU
-S&P BSE TECK
-S&P BSE BANKEX
-S&P BSE MID CAP
-S&P BSE SMALL CAP
-S&P BSE REALTY
-S&P BSE POWER
-S&P BSE IPO
-S&P BSE GREENEX
-S&P BSE SME IPO
-S&P BSE CARBONEX
-""".strip().split('\n')
 
-index_constituents_file = os.path.join(indices_dir, 'bse_index_constituents.csv')
-cols = ['index_name', 'bsecode', 'company_name', 'free_float', 'industry']
+def get_index_name(index_file_name):
+    s = os.path.split(os.path.splitext(index_file_name)[0])[-1]
+    s = s.replace('S&P BSE ', '')
+    s = s.replace('index_Constituents', '')
+    s = s.replace('& ', '').replace(' ', '_')
+    s = s.lower()
+    s = 'bse_' + s
 
-class IndexConstituents:
-    def __init__(self):
-        self._file = index_constituents_file
-        self._df = pd.read_csv(index_constituents_file, skiprows=2,
-                header=None, names=cols, skipinitialspace=True)
-        self._df.bsecode = self._df.bsecode.astype(str)
-        self._df = self._df.set_index('bsecode', drop=False)
+    return s
 
-    @property
-    def df(self):
-        return self._df
+def test_get_index_name():
+    assert get_index_name('S&P BSE SmallCapindex_Constituents.csv') == 'bse_smallcap'
 
-    @property
-    def bse_sensex(self):
-        return self._df[self._df.index_name == 'S&P BSE SENSEX']
 
-    @property
-    def bse_500(self):
-        return self._df[self._df.index_name == 'S&P BSE 500']
+bse_index_files = glob(os.path.join(bse_indices_data_dir, '*BSE*.csv'))
 
-    @property
-    def bse_100(self):
-        return self._df[self._df.index_name == 'S&P BSE 100']
+bse_index_names = [get_index_name(f) for f in bse_index_files]
 
-    @property
-    def bse_200(self):
-        return self._df[self._df.index_name == 'S&P BSE 200']
+index_name_to_file_map = {get_index_name(f): f for f in bse_index_files}
 
-    @property
-    def capital_goods(self):
-        return self._df[self._df.index_name == 'S&P BSE CAPITAL GOODS']
 
-    @property
-    def consumer_durables(self):
-        return self._df[self._df.index_name == 'S&P BSE CONSUMER DURABLES']
+def get_index_constituents(index_name):
+    df = pd.read_csv(index_name_to_file_map.get(index_name))
+    df.columns = ['bsecode', 'company', 'isin', 'close']
+    return df
 
-    @property
-    def fmcg(self):
-        return self._df[self._df.index_name == 'S&P BSE FMCG']
+def get_all_indices_constituents():
+    bse_indices = {index: get_index_constituents(index) for index in bse_index_names}
 
-    @property
-    def health_care(self):
-        return self._df[self._df.index_name == 'S&P BSE HEALTHCARE']
-
-    @property
-    def it(self):
-        return self._df[self._df.index_name == 'S&P BSE IT']
-
-    @property
-    def metal(self):
-        return self._df[self._df.index_name == 'S&P BSE METAL']
-
-    @property
-    def oilgas(self):
-        return self._df[self._df.index_name == 'S&P BSE OIL & GAS']
-
-    @property
-    def auto(self):
-        return self._df[self._df.index_name == 'S&P BSE AUTO']
-
-    @property
-    def psu(self):
-        return self._df[self._df.index_name == 'S&P BSE PSU']
-
-    @property
-    def teck(self):
-        return self._df[self._df.index_name == 'S&P BSE TECK']
-
-    @property
-    def bankex(self):
-        return self._df[self._df.index_name == 'S&P BSE BANKEX']
-
-    @property
-    def bse_midcap(self):
-        return self._df[self._df.index_name == 'S&P BSE MID CAP']
-
-    @property
-    def bse_smallcap(self):
-        return self._df[self._df.index_name == 'S&P BSE SMALL CAP']
-
-    @property
-    def realty(self):
-        return self._df[self._df.index_name == 'S&P BSE REALTY']
-
-    @property
-    def power(self):
-        return self._df[self._df.index_name == 'S&P BSE POWER']
-
-    @property
-    def ipo(self):
-        return self._df[self._df.index_name == 'S&P BSE IPO']
-
-    @property
-    def greenex(self):
-        return self._df[self._df.index_name == 'S&P BSE GREENEX']
-
-    @property
-    def smeipo(self):
-        return self._df[self._df.index_name == 'S&P BSE SME IPO']
-
-    @property
-    def carbonex(self):
-        return self._df[self._df.index_name == 'S&P BSE CARBONEX']
-
-    def exclude_useless_companies(self):
-        # exclude greenex, carbonex, ipo, sme ipo
-        df = self._df[self._df.index_name != 'S&P BSE GREENEX']
-        df = self._df[self._df.index_name != 'S&P BSE CARBONEX']
-        df = self._df[self._df.index_name != 'S&P BSE IPO']
-        df = self._df[self._df.index_name != 'S&P BSE SME IPO']
-        return df
-
-    @property
-    def companies(self):
-        companies = self.exclude_useless_companies()
-        return set(companies.bsecode)
-
-    @property
-    def useful_companies(self):
-        companies = self.exclude_useless_companies()
-        df = companies['company_name'].drop_duplicates()
-        df = pd.DataFrame(df)
-        return df
-
-    @property
-    def industries(self):
-        return set(self._df.industry)
-
-    @property
-    def consumer_durables_companies(self):
-        pass
-
-useful_companies = IndexConstituents().useful_companies
+    return bse_indices
 
 if __name__ == '__main__':
-    #ic = IndexConstituents()
-    #print ic.sensex.company_name
-    #print ic.midcap.company_name
-    #print ic.smallcap.company_name
-    #print ic.company_names
-    print company_names
+    for ix in bse_indices.keys():
+        print ix
+        print bse_indices.get(ix)._df.head()[['bsecode', 'company']]
+        print
+
+    print bse_indices.get('bse_sensex_50')._df[['company']]
+

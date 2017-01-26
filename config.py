@@ -15,7 +15,7 @@ bse_bhavcopy_data_dir = os.path.join(data_dir, 'bhavcopy', 'bse')
 nse_bhavcopy_data_dir = os.path.join(data_dir, 'bhavcopy', 'nse')
 
 # bse indices
-bse_indices_data_dir = os.path.join(data_dir, 'indices')
+bse_indices_data_dir = os.path.join(data_dir, 'bse', 'indices')
 bse30_data_file = os.path.join(bse_indices_data_dir, 'bse_sensex.csv')
 midcap_data_file = os.path.join(bse_indices_data_dir, 'bse_midcap.csv')
 smlcap_data_file = os.path.join(bse_indices_data_dir, 'bse_smallcap.csv')

@@ -6,14 +6,17 @@ data_dir = os.environ['INVESTING_DATA_DIR']
 
 def sensex():
 
-    file_hist_sensex_monthly = os.path.join(data_dir, 'bse', 'hist_sensex_monthly.csv')
+    file_hist_sensex_monthly = os.path.join(data_dir, 'bse', 'bse_ratios.xlsx')
 
-    df = pd.read_csv(file_hist_sensex_monthly,
-                     index_col = 'date',
-                     parse_dates = True,
-                     dayfirst = True,
-                     thousands = ',',
-                     na_values = '-')
+    df = pd.read_excel(
+            file_hist_sensex_monthly,
+            sheet='sensex',
+            index_col = 'date',
+            parse_dates = True,
+            dayfirst = True,
+            thousands = ',',
+            na_values = '-'
+            )
 
     df = df.sort_index()
 
